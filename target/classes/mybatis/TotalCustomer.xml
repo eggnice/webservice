@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ws.dao.TotalCustomerDao">
+
+	<!-- Map结果 -->
+	<resultMap type="com.ws.entity.TotalCustomer" id="allMap">
+		<result column="AMOUNT" property="total"/><!-- 客户量-->
+	</resultMap>
+	
+	<!-- 集团 -->
+	<select id="listGroupCustomer" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE
+		oc.CUST_STATUS = 1 AND oc.CREATE_TIME &lt;= now() and oc.TYPE_ID
+		not in ('fff6d5cf3d9a4a5a97ca77a141121624');
+	</select>
+	
+	<!-- 互联网 -->
+	<select id="listInternetCustomer" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE
+		oc.CUST_STATUS = 1 AND oc.CREATE_TIME &lt;= now() and 
+		oc.TYPE_ID = 'fff6d5cf3d9a4a5a97ca77a141121624';
+	</select>
+	
+</mapper>

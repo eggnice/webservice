@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ws.dao.ProductOrderDao">
+
+	<!-- Map结果 -->
+	<resultMap type="com.ws.entity.ProductOrder" id="allMap">
+		<result column="AMOUNT" property="total"/><!-- 资源池订单量-->
+		<result column="NAME" property="product"/><!-- 产品名称 -->
+		<result column="CMP_POOL_ID" property="pool"/><!-- 资源池 -->
+	</resultMap>
+	
+	<!-- result -->
+	<select id="listProductOrder" resultMap="allMap">
+		SELECT COUNT(ooe.ID) AMOUNT, osl.`NAME` NAME, ort.CMP_POOL_ID FROM `opm_order_ext` ooe
+        LEFT JOIN opm_service_info osi ON ooe.SERVICE_INFO_ID = osi.ID
+        LEFT JOIN opm_service_list osl ON osi.CMP_SERVICE_LIST_ID = osl.ID
+        left join opm_resource_template ort on ooe.POOL_TEMPLATE_ID=ort.ID 
+        WHERE ooe.`STATUS` = 6
+        AND ort.CMP_POOL_ID = #{pool_id}
+        AND osl.`NAME` IN('云空间', '云主机', '公网IP', '带宽', '容量型云硬盘', '性能型云硬盘', 
+		'子网', 'VPC', 'SAAS', '对象存储', '云主机安全', '性能优化型云硬盘', '抗DDoS', '弹性负载均衡',
+ 		'高性能型云硬盘', '云硬盘备份', 'WEB应用防护', 'WEB漏洞扫描', '模板编配', '云防火墙', '弹性伸缩', 
+		'云主机备份', '系统漏洞扫描', '云数据库', 'IPSecVPN')
+        GROUP BY osl.`NAME`
+	</select>
+
+</mapper>

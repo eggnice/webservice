@@ -11,12 +11,12 @@
                         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
                         
 	<!-- 自动扫描 -->
-	<context:component-scan base-package="com.shsnc.yun.ws" />
+	<context:component-scan base-package="com.ws"/>
 
 	<!-- 引入配置文件 -->
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:/jdbc.properties" />
+		<property name="location" value="classpath:jdbc.properties" />
 	</bean>
 	
 
@@ -77,14 +77,14 @@
 	<!-- 配置Mapper扫描器 -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<!-- 扫描包路径,如果需要扫描多个包中间用半角逗号隔开 -->
-		<property name="basePackage" value="com.shsnc.yun.ws.dao" />
+		<property name="basePackage" value="com.ws.dao" />
 		<!-- 这边不能使用ref="sqlSessionFactory"原因是因为上面加载配置文件导致这边引用会报错 -->
 		<property name="sqlSessionFactoryBeanName" value="cloudmaster_sqlSessionFactory" />
 	</bean>
 	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<!-- 扫描包路径,如果需要扫描多个包中间用半角逗号隔开 -->
-		<property name="basePackage" value="com.shsnc.yun.ws.dao" />
+		<property name="basePackage" value="com.ws.dao" />
 		<!-- 这边不能使用ref="sqlSessionFactory"原因是因为上面加载配置文件导致这边引用会报错 -->
 		<property name="sqlSessionFactoryBeanName" value="assistdb_sqlSessionFactory" />
 	</bean>

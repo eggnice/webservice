@@ -2,116 +2,60 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.shsnc.yun.ws.dao.CapacityManagementDao">
+<mapper namespace="com.ws.dao.CapacityManagementDao">
 
 	<!-- Map结果 -->
-	<resultMap type="com.shsnc.yun.ws.entity.CapacityManagement" id="allMap">
+	<resultMap type="com.ws.entity.CapacityManagement" id="allMap">
 		<result column="cpu" property="cpu"/><!-- cpu总量 -->
 		<result column="ucpu" property="ucpu"/><!-- cpu使用量 -->
 		<result column="mem" property="mem"/><!-- 内存总量 -->
 		<result column="umem" property="umem"/><!-- 内存使用量 -->
+		<result column="disk" property="disk"/><!-- 磁盘总量 -->
+		<result column="udisk" property="udisk"/>
 		<result column="cbs" property="cbs"/><!-- 云硬盘总量 -->
+		<result column="ucbs" property="ucbs"/>
 		<result column="pbs" property="pbs"/><!-- 硬盘总量 -->
+		<result column="upbs" property="upbs"/>
 		<result column="obs" property="obs"/><!-- 云存储总量 -->
 		<result column="uobs" property="uobs"/><!-- 云存储使用量 -->
+		<result column="webdisk" property="webdisk"/>
+		<result column="uwebdisk" property="uwebdisk"/>
 		<result column="bandwidth" property="bandwidth"/><!-- 公网带宽总量 -->
+		<result column="ubandwith" property="ubandwidth"/>
 		<result column="pubip" property="pubip"/><!-- 公网IP总量 -->
+		<result column="upubip" property="upubip"/>
+		<result column="elb" property="elb"/>
+		<result column="uelb" property="uelb"/>
 	</resultMap>
 	
-	<resultMap type="com.shsnc.yun.ws.entity.CapacityManagement" id="useMap">
-		<result column="cbs" property="ucbs"/><!-- 云硬盘使用量 -->
-		<result column="pbs" property="upbs"/><!-- 硬盘使用量  -->
-		<result column="obs" property="uobs"/><!-- 云存储使用量 -->
-	</resultMap>
-	
-	<resultMap type="com.shsnc.yun.ws.entity.CapacityManagement" id="ipUseMap">
-		<result column="bandwidth" property="ubandwidth"/><!-- 公网带宽使用量 -->
-		<result column="pubip" property="upubip"/><!-- 公网IP使用量 -->
-	</resultMap>
-	
-	<!-- 华南节点cpu、内存数据总量与使用量 -->
-	<select id="southCpuMem" resultMap="allMap">
-		SELECT ocs.cpu,ocs.ucpu,ocs.mem,ocs.umem FROM `opm_cap_singlemachin` ocs
-		WHERE ocs.poolid = 'CIDC-RP-02'
+	<!-- 华南节点云主机:cpu,mem,disk总量与使用量 -->
+	<select id="machin" resultMap="allMap">
+		SELECT sum(p.cpu) cpu,sum(p.ucpu) ucpu,sum(p.mem) mem,sum(p.umem) umem,
+		sum(p.disk) disk,sum(p.udisk) udisk FROM
+		(SELECT ocs.cpu,ocs.ucpu,ocs.mem,ocs.umem,ocs.disk,ocs.udisk FROM `opm_cap_singlemachin` ocs
+		WHERE ocs.poolid='CIDC-RP-02'
 		ORDER BY ocs.creattime DESC
-		LIMIT 2;
+		LIMIT 2) p;
 	</select>
 	
-	<!-- 华北节点cpu、内存数据总量与使用量 -->
-	<select id="northCpuMem" resultMap="allMap">
-		SELECT ocs.cpu,ocs.ucpu,ocs.mem,ocs.umem FROM `opm_cap_singlemachin` ocs
-		WHERE ocs.poolid = 'CIDC-RP-03'
-		ORDER BY ocs.creattime DESC
-		LIMIT 2;
+	<!-- 华南机节点存储总量和使用量(pbs,ebs,obs,weddisk) -->
+	<select id="storage" resultMap="allMap">
+		SELECT a.cbs,a.pbs,b.cbs ucbs,b.pbs upbs,a.webdisk,b.webdisk uwebdisk,c.obs,c.uobs FROM 
+		(SELECT oca.cbs,oca.pbs,oca.webdisk FROM opm_cap_all oca WHERE oca.poolid='CIDC-RP-02' 
+		ORDER BY oca.creattime DESC LIMIT 1) a,
+  		(SELECT ocau.cbs,ocau.pbs,ocau.webdisk FROM opm_cap_all_used ocau WHERE 
+  		ocau.poolid='CIDC-RP-02' ORDER BY ocau.creattime DESC LIMIT 1) b,
+  		(SELECT ocrs.obs,ocrs.uobs FROM opm_cap_resource_stat ocrs 
+  		ORDER BY ocrs.creattime DESC LIMIT 1) c;
 	</select>
 	
-	<!-- 华南节点云硬盘、硬盘数据总量 -->
-	<select id="southCbsPbs" resultMap="allMap">
-		SELECT oca.cbs,oca.pbs FROM `opm_cap_all` oca
-		WHERE oca.poolid = 'CIDC-RP-02'
-		ORDER BY oca.creattime DESC 
-		LIMIT 1
-	</select>
-	
-	<!-- 华南节点云硬盘、硬盘数据使用量 -->
-	<select id="southUseCbsPbs" resultMap="useMap">
-		SELECT ocau.cbs,ocau.pbs FROM `opm_cap_all_used` ocau
-		WHERE ocau.poolid = 'CIDC-RP-02'
-		ORDER BY ocau.creattime DESC 
-		LIMIT 1
-	</select>
-	
-	<!-- 华南节点云存储数据总量与使用量 -->
-	<select id="southObs" resultMap="allMap">
-		SELECT ocrs.obs,ocrs.uobs FROM opm_cap_resource_stat ocrs
-		ORDER BY ocrs.creattime DESC 
-		LIMIT 1
-	</select>
-	
-	<!-- 华北节点云硬盘、硬盘、云存储数据总量 -->
-	<select id="northCbsPbsObs" resultMap="allMap">
-		SELECT oca.cbs,oca.pbs,oca.obs FROM `opm_cap_all` oca
-		WHERE oca.poolid = 'CIDC-RP-03'
-		ORDER BY oca.creattime DESC 
-		LIMIT 1
-	</select>
-	
-	<!-- 华北节点云硬盘、硬盘、云存储数据使用量 -->
-	<select id="northUseCbsPbsObs" resultMap="useMap">
-		SELECT ocau.cbs,ocau.pbs,ocau.obs FROM `opm_cap_all_used` ocau
-		WHERE ocau.poolid = 'CIDC-RP-03'
-		ORDER BY ocau.creattime DESC 
-		LIMIT 1
-	</select>
-	
-	<!-- 华南节点公网带宽、公网IP数据总量 -->
-	<select id="southBandwidthIp" resultMap="allMap">
-		SELECT ocnq.bandwidth,ocnq.pubip FROM `opm_cap_net_quota` ocnq
+	<!-- 华南节点网络:ip,bandwidth使用量 -->
+	<select id="network" resultMap="allMap">
+		SELECT ocnq.bandwidth,ocnq.pubip,ocnq.elb,ocau.elb uelb,ocau.bandwidth ubandwidth,
+		ocau.pubip upubip FROM `opm_cap_net_quota` ocnq
+		LEFT JOIN opm_cap_all_used ocau ON ocnq.poolid=ocau.poolid
 		WHERE ocnq.poolid='CIDC-RP-02'
+		ORDER BY ocau.creattime DESC LIMIT 1;
 	</select>
-	
-	<!-- 华南节点公网带宽、公网IP数据使用量 -->
-	<select id="southUseBandwidthIp" resultMap="ipUseMap">
-		SELECT ocau.bandwidth ,ocau.pubip FROM `opm_cap_all_used` ocau
-		WHERE ocau.poolid = 'CIDC-RP-02'
-		ORDER BY ocau.creattime DESC
-		LIMIT 1
-	</select>
-	
-	<!-- 华北节点公网带宽、公网IP数据总量 -->
-	<select id="northBandwidthIp" resultMap="allMap">
-		SELECT ocnq.bandwidth,ocnq.pubip FROM `opm_cap_net_quota` ocnq
-		WHERE ocnq.poolid='CIDC-RP-03'
-	</select>
-	
-	<!-- 华北节点公网带宽、公网IP数据使用量 -->
-	<select id="northUseBandwidthIp" resultMap="ipUseMap">
-		SELECT ocau.bandwidth ,ocau.pubip FROM `opm_cap_all_used` ocau
-		WHERE ocau.poolid = 'CIDC-RP-03'
-		ORDER BY ocau.creattime DESC
-		LIMIT 1
-	</select>
-	
-	
-	
+		
 </mapper>

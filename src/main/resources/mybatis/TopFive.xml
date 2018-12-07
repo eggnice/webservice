@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ws.dao.TopFiveDao">
+
+	<!-- Map结果 -->
+	<resultMap type="com.ws.entity.TopFive" id="allMap">
+		<result column="AMOUNT" property="total"/><!-- 订单量-->
+		<result column="NAME" property="product"/><!-- 产品名称 -->
+		<result column="ATTRIBUTE_VALUE" property="result"/>
+		<result column="cpu_value" property="cpu"/>
+		<result column="ram_value" property="ram"/>
+	</resultMap>
+	
+	<!-- 云主机 -->
+	<select id="listComputeTopFive" resultMap="allMap">
+		SELECT count(cpu.ID) AMOUNT,cpu.`NAME`,cpu.ATTRIBUTE_VALUE cpu_value,orta.ATTRIBUTE_VALUE ram_value 
+		FROM (SELECT ooe.ID, osl.`NAME`,orta.ATTRIBUTE_VALUE,orta.RESOURCE_TEMPLATE_ID FROM opm_order_ext ooe 
+		LEFT JOIN opm_service_info osi ON ooe.SERVICE_INFO_ID = osi.ID
+		LEFT JOIN opm_service_list osl ON osi.CMP_SERVICE_LIST_ID = osl.ID
+		LEFT JOIN opm_resource_template_attribute orta ON osi.POOL_TEMPLATE_ID = orta.RESOURCE_TEMPLATE_ID
+		WHERE ooe.`STATUS` = 6
+		AND osl.`NAME` = '云主机'
+		AND orta.ATTRIBUTE_KEY = 'cpu') cpu
+		LEFT JOIN opm_resource_template_attribute orta ON cpu.RESOURCE_TEMPLATE_ID = orta.RESOURCE_TEMPLATE_ID
+		WHERE orta.ATTRIBUTE_KEY = 'ram'
+		GROUP BY cpu.ATTRIBUTE_VALUE, orta.ATTRIBUTE_VALUE
+		ORDER BY AMOUNT DESC LIMIT 5;
+	</select>
+
+	<!-- 云硬盘 -->
+	<select id="listDiskTopFive" resultMap="allMap">
+		SELECT count(ooe.ID) AMOUNT, osl.`NAME`, orta.ATTRIBUTE_VALUE FROM opm_order_ext ooe 
+		LEFT JOIN opm_service_info osi ON ooe.SERVICE_INFO_ID = osi.ID
+		LEFT JOIN opm_service_list osl ON osi.CMP_SERVICE_LIST_ID = osl.ID
+		LEFT JOIN opm_resource_template_attribute orta ON osi.POOL_TEMPLATE_ID = orta.RESOURCE_TEMPLATE_ID
+		WHERE ooe.`STATUS` = 6
+		AND osl.`NAME` in  ('容量型云硬盘', '性能型云硬盘', '性能优化型云硬盘', '高性能型云硬盘')
+		AND orta.ATTRIBUTE_KEY = 'volumeSize'
+		GROUP BY osl.`NAME`, orta.ATTRIBUTE_VALUE
+		ORDER BY AMOUNT DESC LIMIT 5;
+	</select>
+	
+	<!-- 云空间 -->
+	<select id="listCloudSpaceTopFive" resultMap="allMap">
+		SELECT count(ooe.ID) AMOUNT, osl.`NAME`, orta.ATTRIBUTE_VALUE FROM opm_order_ext ooe 
+		LEFT JOIN opm_service_info osi ON ooe.SERVICE_INFO_ID = osi.ID
+		LEFT JOIN opm_service_list osl ON osi.CMP_SERVICE_LIST_ID = osl.ID
+		LEFT JOIN opm_resource_template_attribute orta ON osi.POOL_TEMPLATE_ID = orta.RESOURCE_TEMPLATE_ID
+		WHERE ooe.`STATUS` = 6
+		AND osl.`NAME` = '云空间'
+		AND orta.ATTRIBUTE_KEY = 'corpTotalCapacity'
+		GROUP BY orta.RESOURCE_TEMPLATE_ID
+		ORDER BY AMOUNT DESC LIMIT 5;
+	</select>
+		
+	<!-- 带宽 -->
+	<select id="listBandwidthTopFive" resultMap="allMap">
+		SELECT count(ooe.ID) AMOUNT, osl.`NAME`, orta.ATTRIBUTE_VALUE FROM opm_order_ext ooe 
+		LEFT JOIN opm_service_info osi ON ooe.SERVICE_INFO_ID = osi.ID
+		LEFT JOIN opm_service_list osl ON osi.CMP_SERVICE_LIST_ID = osl.ID
+		LEFT JOIN opm_resource_template_attribute orta ON osi.POOL_TEMPLATE_ID = orta.RESOURCE_TEMPLATE_ID
+		WHERE ooe.`STATUS` = 6
+		AND osl.`NAME` = '带宽'
+		AND orta.ATTRIBUTE_KEY = 'BandwidthSize'
+		GROUP BY orta.ATTRIBUTE_VALUE
+		ORDER BY AMOUNT DESC LIMIT 5;	
+	</select>
+</mapper>

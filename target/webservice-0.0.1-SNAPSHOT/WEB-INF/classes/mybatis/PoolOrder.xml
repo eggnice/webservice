@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ws.dao.PoolOrderDao">
+
+	<!-- Map结果 -->
+	<resultMap type="com.ws.entity.PoolOrder" id="allMap">
+		<result column="AMOUNT" property="total"/><!-- 资源池订单量-->
+		<result column="NAME" property="pool"/><!-- 资源池名称名称 -->
+	</resultMap>
+	
+	<!-- 客户行业分布 -->
+	<select id="listPoolOrder" resultMap="allMap">
+		SELECT COUNT(oo.ORDER_ID) AMOUNT, op.`NAME` FROM  opm_order oo LEFT JOIN
+		`opm_order_ext` ooe on oo.ORDER_ID = ooe.ORDER_ID  
+		left join opm_resource_template ort on ooe.POOL_TEMPLATE_ID=ort.ID 
+		left join opm_pool op on ort.CMP_POOL_ID = op.ID 
+		WHERE ort.CMP_POOL_ID in ('CIDC-RP-00', 'CIDC-RP-01', 'CIDC-RP-02', 
+		'CIDC-RP-03', 'CIDC-RP-04', 'CIDC-RP-07')
+		GROUP BY ort.CMP_POOL_ID;
+	</select>
+
+</mapper>

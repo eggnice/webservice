@@ -9,7 +9,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
+		<java.version>1.8</java.version>
 		<servlet-api.version>3.0.1</servlet-api.version>
 		<!-- junit -->
 		<junit.version>4.11</junit.version>
@@ -215,6 +215,7 @@
 
 	</dependencies>
 
-
+<build> <plugins> <plugin> 
+<artifactId>maven-compiler-plugin</artifactId> <configuration> <target>1.8</target> <source>1.8</source> <encoding>UTF-8</encoding> </configuration> </plugin> </plugins> </build>
 
 </project>

@@ -8,12 +8,12 @@
 	<!-- CXF webservice配置 -->
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 
-	<bean id="zzlyWsImpl" class="com.shsnc.yun.ws.service.impl.ZZLYWebServiceImpl" />
+	<bean id="zzlyWsImpl" class="com.ws.service.impl.ZZLYWebServiceImpl" />
 	<bean id="inMessageInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 	<bean id="outLoggingInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
 	
 	<!-- 注意下面的address，这里的address的名称就是访问的WebService的name -->
-	<jaxws:server id="zzlyWS" serviceClass="com.shsnc.yun.ws.service.ZZLYWebService" address="zzlyWS">
+	<jaxws:server id="zzlyWS" serviceClass="com.ws.service.ZZLYWebService" address="zzlyWS">
 		<jaxws:serviceBean>
 			<ref bean="zzlyWsImpl" />
 		</jaxws:serviceBean>

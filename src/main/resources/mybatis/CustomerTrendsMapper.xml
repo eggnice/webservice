@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ws.dao.CustomerTrendsDao">
+
+	<!-- Map结果 -->
+	<resultMap type="com.ws.entity.CustomerTrends" id="allMap">
+		<result column="AMOUNT" property="amount"/><!-- 用户数量 -->
+	</resultMap>
+	
+	<!-- 到现在用户数 -->
+	<select id="showCurrentYear" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE oc.CUST_STATUS = 1 AND oc.CREATE_TIME &lt; now()
+	</select>
+	
+	<!-- 到前一年用户数 -->
+	<select id="showLastYear" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE oc.CUST_STATUS = 1 
+		AND oc.CREATE_TIME &lt; concat(YEAR(now())-1,'-12-31 23:59:59')
+	</select>
+	
+	<!-- 到前两年用户数 -->
+	<select id="showLastTowYear" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE oc.CUST_STATUS = 1 
+		AND oc.CREATE_TIME &lt; concat(YEAR(now())-2,'-12-31 23:59:59')
+	</select>
+	
+	<!-- 到前三年用户数 -->
+	<select id="showLastThreeYear" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE oc.CUST_STATUS = 1 
+		AND oc.CREATE_TIME &lt; concat(YEAR(now())-3,'-12-31 23:59:59')	
+	</select>
+	
+	<!-- 到前四年用户数 -->
+	<select id="showLastFourYear" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE oc.CUST_STATUS = 1 
+		AND oc.CREATE_TIME &lt; concat(YEAR(now())-4,'-12-31 23:59:59')
+	</select>
+	
+	<!-- 到前五年用户数 -->
+	<select id="showLastFiveYear" resultMap="allMap">
+		SELECT COUNT(oc.ID) AMOUNT FROM `opm_customer` oc WHERE oc.CUST_STATUS = 1 
+		AND oc.CREATE_TIME &lt; concat(YEAR(now())-5,'-12-31 23:59:59')	
+	</select>
+	 
+	
+</mapper>
