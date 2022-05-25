@@ -16,7 +16,7 @@
 		<!-- CXF -->
 		<cxf.version>3.1.5</cxf.version>
 		<!-- Spring -->
-		<spring.version>4.0.2.RELEASE</spring.version>
+		<spring.version>5.2.22.RELEASE</spring.version>
 		<!-- mybatis版本号 -->
 		<mybatis.version>3.2.6</mybatis.version>
 		<!-- mysql -->
